@@ -97,7 +97,7 @@ def main():
     }
     # Download the urls and save only the ones with valid hash o ensure underlying image has not changed
     for index in list(hash_dict.keys()):
-        image_url = f'https://i.imgur.com/{index}.jpg'
+        image_url = f'https://i.imgur.com/{index}.jpeg'
         img_data = requests.get(image_url, headers=headers).content
         if len(img_data) < 100:
             print(f"URL retrieval for {index} failed!!\n")
