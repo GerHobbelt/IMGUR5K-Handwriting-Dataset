@@ -97,20 +97,27 @@ def main():
     }
     # Download the urls and save only the ones with valid hash o ensure underlying image has not changed
     for index in list(hash_dict.keys()):
+        image_path = f'{args.output_dir}/{index}.jpg'
+        if os.path.isfile(image_path):
+            print(f"Skipping: destination file for {index} already exists!\n")
+            num_match += 1
+            continue
+            
         image_url = f'https://i.imgur.com/{index}.jpeg'
         img_data = requests.get(image_url, headers=headers).content
         if len(img_data) < 100:
             print(f"URL retrieval for {index} failed!!\n")
             invalid_urls.append(image_url)
             continue
-        with open(f'{args.output_dir}/{index}.jpg', 'wb') as handler:
+        with open(image_path, 'wb') as handler:
             handler.write(img_data)
 
-        compute_image_hash(f'{args.output_dir}/{index}.jpg')
+        compute_image_hash(image_path)
         tot_evals += 1
-        if hash_dict[index] != compute_image_hash(f'{args.output_dir}/{index}.jpg'):
-            print(f"For IMG: {index}, ref hash: {hash_dict[index]} != cur hash: {compute_image_hash(f'{args.output_dir}/{index}.jpg')}")
-            os.remove(f'{args.output_dir}/{index}.jpg')
+        if hash_dict[index] != compute_image_hash(image_path):
+            print(f"For IMG: {index}, ref hash: {hash_dict[index]} != cur hash: {compute_image_hash(image_path)}")
+            # os.remove(image_path)
+            os.rename(image_path, f'{args.output_dir}/__SUSPECT__.{index}.jpg')
             invalid_urls.append(image_url)
             continue
         else:
